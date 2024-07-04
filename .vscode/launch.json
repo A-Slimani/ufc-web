@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Launch Flask debug",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "flask",
+            "args": "--app app run --debug",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/app",
+        }
+    ]
+}

@@ -10,51 +10,69 @@
 </head>
 <header>
     <h1>UFC</h1>
+    <h2>Fighters</h2>
 </header>
 <body class="container">
-    <h2>Fighters</h2>
-    <div class="container">
-        <a href="/previous_events">Previous Events</a>
+    <div class="menu">
+        {% for page in page_list %}
+            {% if loop.index > 1 and loop.index < page_list|length %}
+                <a> | </a>
+            {% endif %}
+            {% if page['url'] != url %}
+                <a href="{{ page['url'] }}">{{ page.title }}</a>
+            {% endif %}
+        {% endfor %}
     </div>
     <div id="table"></div>
     <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
     <script>
-        new gridjs.Grid({
-            columns: [
+        let fighterColumns = [
                 { id: 'name', name: 'Name' },
                 { id: 'nationality', name: 'Nationality' },
-                { id: 'age', name: 'Age', sort: { compare: (a, b) => a - b } },
-                { 
-                    id: 'weight_class', 
-                    name: 'Weight class', 
-                    sort: 
-                        { 
-                            compare: (a, b) => {
-                                const weightClasses = ['None', 'Strawweight' ,'Flyweight', 'Bantamweight', 'Featherweight', 'Lightweight', 'Welterweight', 'Middleweight', 'Light Heavyweight', 'Heavyweight', 'Super Heavyweight'];
-                                return weightClasses.indexOf(a) - weightClasses.indexOf(b);
-                            }
+                { id: 'age', name: 'Age'},
+                { id: 'weight_class', name: 'Weight class'},
+                { id: 'wins', name: 'Wins'},
+                { id: 'losses', name: 'Losses'}
+        ]
+        new gridjs.Grid({
+            columns: fighterColumns, 
+            sort: {
+                server: {
+                    url: (prev, columns) => {
+                        if (!columns.length) return prev;
+
+                        const col = columns[0];
+                        const dir = col.direction === 1 ? 'asc' : 'desc';
+                        let colName = fighterColumns[col.index].id;
+
+                        const separator = prev.includes('?') ? '&' : '?';
+
+                        return `${prev}${separator}col=${colName}&dir=${dir}`;
                     }
-                },
-                { id: 'wins', name: 'Wins', sort: { compare: (a, b) => a - b } },
-                { id: 'losses', name: 'Losses', sort: { compare: (a, b) => a - b } }
-            ],
-            data: [
-                {% for fighter in fighters %}
-                    {
-                        name: '{{ fighter.name }}',
-                        nationality: '{{ fighter.nationality }}',
-                        age: '{{ fighter.age }}',
-                        weight_class: '{{ fighter.weight_class }}',
-                        wins: '{{ fighter.wins }}',
-                        losses: '{{ fighter.losses }}'
-                    },
-                {% endfor %}
-            ],
-            search: true,
-            sort: true,
+                }
+            },
             pagination: {
-                limit: 20 
-            } 
+                limit: 20,
+                server: {
+                    url: (prev, page, limit) => {
+                        const separator = prev.includes('?') ? '&' : '?';
+                        return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+                    },
+                }
+            },
+            search: {
+                server: {
+                    url: (prev, keyword) => {
+                        const separator = prev.includes('?') ? '&' : '?';
+                        return `${prev}${separator}search=${keyword}`;
+                    }
+                }
+            },
+            server: {
+                url: '/api/fighters',
+                then: data => data.fighters,
+                total: data => data.pagination?.total,
+            }
         }).render(document.getElementById("table"));
     </script>
 </body>

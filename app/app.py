@@ -1,9 +1,13 @@
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from extensions import db
-from models import Fighter, Fights
+from routes.fighters import fighters_blueprint
+from routes.fights import fights_blueprint
+from routes.events import events_blueprint
+from extensions import db, page_list
+import logging
 import dotenv
 import os
+
+logging.basicConfig(filename='application.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 env = dotenv.load_dotenv()
 db_user = os.getenv('DB_USER')
@@ -17,24 +21,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_pass}@{db_h
 
 db.init_app(app)
 
-@app.route('/')
+app.register_blueprint(fighters_blueprint)
+app.register_blueprint(fights_blueprint)
+app.register_blueprint(events_blueprint)
+
+url = '/'
+@app.route(url)
 def index():
-    return render_template('index.html')
-
-@app.route('/previous_events')
-def previous_events():
-    table_headers = [column.name for column in Fights.__table__.columns]
-    events = Fights.query.order_by(Fights.event_title).all()
-    return render_template('previous_events.html', table_headers=table_headers, events=events)
-
-@app.route('/fighters')
-def fighter_list():
-    table_headers = [column.name for column in Fighter.__table__.columns]
-    fighters = Fighter.query.order_by(Fighter.name).all()
-    return render_template('fighters.html', fighters=fighters, table_headers=table_headers)
-
-# on hold for now
-@app.route('/fighter/<id>')
-def fighter_detail(id):
-    fighter = Fighter.query.get(id)
-    return render_template('fighter_detail.html', fighter=fighter)
+    return render_template('index.html', page_list=page_list, url=url)

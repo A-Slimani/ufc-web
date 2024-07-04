@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>UFC Archive</title>
+    <meta name="ufc archive website" content="previous events and fighters info" />
+    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico' ) }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css' ) }}" />
+</head>
+<header>
+    <h1>UFC</h1>
+    <h2>Previous Fights</h2>
+</header>
+
+<body class="container">
+    <div class="menu">
+        {% for page in page_list %}
+            {% if loop.index > 1 and loop.index < page_list|length %}
+                <span> | </span>
+            {% endif %}
+            {% if page['url'] != url %}
+                <a href="{{ page['url'] }}">{{ page['title'] }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div id="table"></div>
+    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+    <script>
+        let fight_columns = [
+            { id: "event_title", name: "Event" },
+            { id: "left_fighter_name", name: "Fighter" },
+            { id: "status", name: "Status" },
+            { id: "right_fighter_name", name: "Fighter" },
+            { id: "method", name: "Method" },
+            { id: "round", name: "Round"}
+        ]
+        new gridjs.Grid({
+            columns: fight_columns,
+            sort: {
+                server: {
+                    url: (prev, columns) => {
+                        if (!columns.length) return prev;
+
+                        const col = columns[0];
+                        const dir = col.direction === 1 ? "asc" : "desc";
+                        let colName = fight_columns[col.index].id;
+
+                        const separator = prev.includes("?") ? "&" : "?";
+
+                        return `${prev}${separator}col=${colName}&dir=${dir}`;
+                    }
+                }
+            },
+            search: {
+                server: {
+                    url: (prev, keyword) => {
+                        const separator = prev.includes("?") ? "&" : "?";
+                        return `${prev}${separator}search=${keyword}`;
+                    }
+                }
+            },
+            pagination: {
+                limit: 15,
+                server: {
+                    url: (prev, page, limit) => {
+                        const separator = prev.includes("?") ? "&" : "?";
+                        return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+                    },
+                }
+            },
+            server: {
+                url: "/api/previous-fights",
+                then: data => data.fights,
+                total: data => data.pagination?.total, 
+            }
+        }).render(document.getElementById("table"));
+    </script>
+</body>

@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <title>UFC Archive</title>
     <meta name="ufc archive website" content="previous events and fighters info" />
+    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
 </head>
+<header>
+    <h1>UFC</h1>
+    <h2>Previous Events</h2>
+</header>
 <body>
-    <header>
-        <h1>UFC</h1>
-        <h2>Home</h2>
-    </header>
-    <div class="container">
+    <div class="menu">
         {% for page in page_list %}
             {% if page['url'] != url %}
                 <a href="{{ page['url'] }}">{{ page.title }}</a>
+                {% if not loop.last %}
+                    <a> | </a>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>
 </body>
+</html>
