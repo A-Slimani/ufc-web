@@ -54,13 +54,12 @@ class Fighter(db.Model):
         }
         
 
-class Fights(db.Model):
+class Fight(db.Model):
     __tablename__ = "fights"
 
     id = db.Column(db.String, primary_key=True)
-    event_title = db.Column(db.String)
-    date = db.Column(db.String)
-    location = db.Column(db.String)
+    event_title = db.Column(db.String, db.ForeignKey('events.title'))
+    event = db.relationship('Event', backref=db.backref('fights', lazy=True))
     left_fighter_id = db.Column(db.String, db.ForeignKey('fighters.id'))
     left_fighter_name = db.Column(db.String, nullable=True)
     left_status = db.Column(db.String)
@@ -89,8 +88,6 @@ class Fights(db.Model):
         return {
             'id': self.id,
             'event_title': self.event_title,
-            'date': self.date,
-            'location': self.location,
             'left_fighter_id': self.left_fighter_id,
             'left_fighter_name': self.left_fighter_name,
             'left_status': self.left_status,
@@ -103,3 +100,17 @@ class Fights(db.Model):
             'time': self.time
         }
         
+class Event(db.Model):
+    __tablename__ = 'events'
+
+    title = db.Column(db.String, primary_key=True)
+    date = db.Column(db.String)
+    location = db.Column(db.String)
+    # fights = db.relationship('Fights', backref='event', lazy=True)
+
+    def json(self):
+        return {
+            'title': self.title,
+            'date': self.date,
+            'location': self.location,
+        }

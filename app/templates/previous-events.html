@@ -14,14 +14,33 @@
 </header>
 <body>
     <div class="menu">
+        {% set ns = namespace(c=1) %}
         {% for page in page_list %}
             {% if page['url'] != url %}
                 <a href="{{ page['url'] }}">{{ page.title }}</a>
-                {% if not loop.last %}
-                    <a> | </a>
+                {% set ns.c = ns.c + 1%}
+                {% if ns.c < page_list|length %}
+                    <span> | </span>
                 {% endif %}
             {% endif %}
         {% endfor %}
     </div>
+    <div id="table"></div>
+    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+    <script>
+        let event_columns = [
+            { id: "title", name: "Title" },
+            { id: "date", name: "Date" },
+            { id: "location", name: "Location" },
+        ] 
+        new gridjs.Grid({
+            column: fight_columns,
+            server: {
+                url: '/api/events',
+                then: data => data.fights,
+                total: data => data.pagination?.total,
+            }
+        }).render(document.getElementById("table"));
+    </script>
 </body>
 </html>
