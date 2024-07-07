@@ -29,7 +29,14 @@
     <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
     <script>
         let event_columns = [
-            { id: "title", name: "Title" },
+            { 
+                id: "title", 
+                name: "Title",
+                formatter: cell => {
+                    // update the href file to have a propa link
+                    return gridjs.html(`<a href="/event/${cell}">${cell}</a>`);
+                }
+            },
             { id: "date", name: "Date" },
             { id: "location", name: "Location" },
         ] 
