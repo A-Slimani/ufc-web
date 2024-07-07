@@ -67,6 +67,7 @@ class Fight(db.Model):
     right_fighter_name = db.Column(db.String, nullable=True)
     right_status = db.Column(db.String)
     weight_class = db.Column(db.String, nullable=True)
+    fight_weight = db.Column(db.Integer)
     method = db.Column(db.String)
     round = db.Column(db.Integer, nullable=True)
     time = db.Column(db.String)
@@ -104,9 +105,8 @@ class Event(db.Model):
     __tablename__ = 'events'
 
     title = db.Column(db.String, primary_key=True)
-    date = db.Column(db.String)
+    date = db.Column(db.DateTime)
     location = db.Column(db.String)
-    # fights = db.relationship('Fights', backref='event', lazy=True)
 
     def json(self):
         return {
@@ -114,3 +114,4 @@ class Event(db.Model):
             'date': self.date,
             'location': self.location,
         }
+

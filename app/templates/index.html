@@ -12,10 +12,15 @@
         <h1>UFC</h1>
         <h2>Home</h2>
     </header>
-    <div class="container">
+    <div class="menu">
+        {% set ns = namespace(c=1) %}
         {% for page in page_list %}
             {% if page['url'] != url %}
                 <a href="{{ page['url'] }}">{{ page.title }}</a>
+                {% set ns.c = ns.c + 1%}
+                {% if ns.c < page_list|length %}
+                    <span> | </span>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>

@@ -12,7 +12,7 @@
     <h1>UFC</h1>
     <h2>Previous Events</h2>
 </header>
-<body>
+<body class="container">
     <div class="menu">
         {% set ns = namespace(c=1) %}
         {% for page in page_list %}
@@ -34,10 +34,42 @@
             { id: "location", name: "Location" },
         ] 
         new gridjs.Grid({
-            column: fight_columns,
+            columns: event_columns,
+            sort: {
+                server: {
+                    url: (prev, columns) => {
+                        if (!columns.length) return prev;
+
+                        const col = columns[0];
+                        const dir = col.direction === 1 ? "asc" : "desc";
+                        let colName = event_columns[col.index].id;
+
+                        const separator = prev.includes("?") ? "&" : "?";
+
+                        return `${prev}${separator}col=${colName}&dir=${dir}`;
+                    }
+                }
+            },
+            search: {
+                server: {
+                    url: (prev, keyword) => {
+                        const separator = prev.includes("?") ? "&" : "?";
+                        return `${prev}${separator}search=${keyword}`;
+                    }
+                }
+            },
+            pagination: {
+                limit: 15,
+                server: {
+                    url: (prev, page, limit) => {
+                        const separator = prev.includes("?") ? "&" : "?";
+                        return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+                    },
+                }
+            },
             server: {
-                url: '/api/events',
-                then: data => data.fights,
+                url: '/api/previous-events',
+                then: data => data.event_list,
                 total: data => data.pagination?.total,
             }
         }).render(document.getElementById("table"));

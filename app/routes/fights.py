@@ -29,7 +29,7 @@ def previous_fights_api():
     if column_name and direction:
         if direction == 'asc':
             if column_name == 'event_title':
-                query = query.order_by(None).order_by(Event.date.asc())
+                query = query.order_by(None).order_by(Event.date.asc()).order_by()
             elif column_name == 'status':
                 query = query.order_by(None).order_by(Fight.left_status.asc())
             elif column_name == 'weight_class':
@@ -55,13 +55,15 @@ def previous_fights_api():
                 )
             else:
                 query = query.order_by(None).order_by(getattr(Fight, column_name).desc())
-
+    
+    # sorting fights by card order
+    query = query.order_by(Fight.fight_weight.asc())
         
     # pagination
     page = request.args.get('page', type=int)
-    pagination = query.paginate(page=page, per_page=limit, error_out=True)
+    paginated_query = query.paginate(page=page, per_page=limit, error_out=True)
     fight_list = []
-    for fight in pagination.items:
+    for fight in paginated_query.items:
         fight_item = fight.json()
         if fight.left_status == 'win':
             fight_item['status'] = 'def.'
@@ -71,13 +73,13 @@ def previous_fights_api():
             fight_item['status'] = 'NC'
         fight_list.append(fight_item) 
     pagination_info = {
-        'page': pagination.page,
-        'pages': pagination.pages,
-        'total': pagination.total,
-        'prev_page': pagination.prev_num,
-        'next_page': pagination.next_num,
-        'has_prev': pagination.has_prev,
-        'has_next': pagination.has_next,
+        'page': paginated_query.page,
+        'pages': paginated_query.pages,
+        'total': paginated_query.total,
+        'prev_page': paginated_query.prev_num,
+        'next_page': paginated_query.next_num,
+        'has_prev': paginated_query.has_prev,
+        'has_next': paginated_query.has_next,
     }
 
     return jsonify({

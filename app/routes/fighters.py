@@ -17,7 +17,6 @@ def fighters_page_api():
 
     # searching
     search_query = request.args.get('search', default=None, type=str)
-    limit = request.args.get('limit', default=20, type=int)
     if search_query:
         query = query.filter(func.lower(Fighter.name).like(f'%{search_query.lower()}%'))
         fighters_list = [fighter.json() for fighter in query]
@@ -49,22 +48,20 @@ def fighters_page_api():
 
     # pagination
     page = request.args.get('page', type=int)
-    pagination = query.order_by(Fighter.name).paginate(page=page, per_page=limit, error_out=True)
-    fighters_list = [fighter.json() for fighter in pagination.items]
+    limit = request.args.get('limit', default=20, type=int)
+    paginated_query = query.order_by(Fighter.name).paginate(page=page, per_page=limit, error_out=True)
+    fighters_list = [fighter.json() for fighter in paginated_query.items]
     pagination_info = {
-        'page': pagination.page,
-        'pages': pagination.pages,
-        'total': pagination.total,
-        'prev_page': pagination.prev_num,
-        'next_page': pagination.next_num,
-        'has_prev': pagination.has_prev,
-        'has_next': pagination.has_next,
+        'page': paginated_query.page,
+        'pages': paginated_query.pages,
+        'total': paginated_query.total,
+        'prev_page': paginated_query.prev_num,
+        'next_page': paginated_query.next_num,
+        'has_prev': paginated_query.has_prev,
+        'has_next': paginated_query.has_next,
     }    
 
-    return jsonify({
-        'fighters': fighters_list,
-        'pagination': pagination_info
-    })
+    return jsonify({'fighters': fighters_list, 'pagination': pagination_info})
 
 
 # on hold for now
