@@ -58,8 +58,9 @@ class Fight(db.Model):
     __tablename__ = "fights"
 
     id = db.Column(db.String, primary_key=True)
-    event_title = db.Column(db.String, db.ForeignKey('events.title'))
     event = db.relationship('Event', backref=db.backref('fights', lazy=True))
+    event_title = db.Column(db.String, db.ForeignKey('events.title'))
+    event_title_cleaned = db.Column(db.String)
     left_fighter_id = db.Column(db.String, db.ForeignKey('fighters.id'))
     left_fighter_name = db.Column(db.String, nullable=True)
     left_status = db.Column(db.String)

@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, render_template, request
 from sqlalchemy import func, case
-from extensions import db, page_list
+from extensions import page_list
 from models import Fight, Event
-import datetime as dt
 
 fights_blueprint = Blueprint('fights', __name__)
 

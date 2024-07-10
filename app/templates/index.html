@@ -24,4 +24,23 @@
             {% endif %}
         {% endfor %}
     </div>
+    <br />
+    <div class="container">
+        <h3>Next Event</h3> 
+        <h3>{{ fights[0]['event_title'] }}</h3>
+        <table class="table">
+            <tr>
+                <th colspan="3">Fight</th> 
+                <th>Weight Class</th>
+            </tr> 
+            {% for fight in fights %}
+                <tr>
+                    <td>{{ fight['left_fighter_name'] }}</td>
+                    <td>vs</td>
+                    <td>{{ fight['right_fighter_name'] }}</td>
+                    <td>{{ fight['weight_class'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>

@@ -26,3 +26,12 @@ a {
     justify-content: center;
     gap: 10px;
 }
+
+.table {
+    text-align: center;
+
+}
+
+.table th, td {
+    padding: 12px;
+}

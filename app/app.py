@@ -3,6 +3,9 @@ from routes.fighters import fighters_blueprint
 from routes.fights import fights_blueprint
 from routes.events import events_blueprint
 from extensions import db, page_list
+from typing import Optional
+from datetime import date
+from models import Fight, Event
 import logging
 import dotenv
 import os
@@ -28,4 +31,9 @@ app.register_blueprint(events_blueprint)
 url = '/'
 @app.route(url)
 def index():
-    return render_template('index.html', page_list=page_list, url=url)
+    query = Event.query.filter(Event.date > date.today()).order_by(Event.date.asc()).first()
+    if query:
+        next_event: str = query.title
+    fights = Fight.query.filter(Fight.event_title == next_event).all()
+
+    return render_template('index.html', page_list=page_list, url=url, fights=fights)

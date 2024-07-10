@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from sqlalchemy import func, case
-from extensions import db, page_list
+from extensions import page_list
 from models import Fighter
 
 fighters_blueprint = Blueprint('fighters', __name__)
