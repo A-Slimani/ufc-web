@@ -6,9 +6,10 @@ db = SQLAlchemy()
 
 template_list = sorted([f for f in os.listdir('./templates') if f.endswith('.html')])
 page_list = []
+ignore_list = ['fight-data.html', 'fighter-profile.html']
 
 for page in template_list:
-    if page == 'fight-data.html':
+    if page in ignore_list:
         continue
     elif page == 'index.html':
         title = 'Home'

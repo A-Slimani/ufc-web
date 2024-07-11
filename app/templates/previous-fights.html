@@ -31,7 +31,14 @@
     <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
     <script>
         let fight_columns = [
-            { id: "event_title", name: "Event" },
+            { 
+                id: "event_title", 
+                name: "Event",
+                formatter: cell => {
+                    let eventCell = cell.replace(/\s*[-\.]\s*|\s+/g, '-');
+                    return gridjs.html(`<a href="/event/${eventCell}">${cell}</a>`);
+                },
+            },
             { id: "left_fighter_name", name: "Fighter" },
             { id: "status", name: "Status" },
             { id: "right_fighter_name", name: "Fighter" },

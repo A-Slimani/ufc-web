@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, request
 from extensions import page_list
 from sqlalchemy import func
 from models import Event, Fight 
+from datetime import date
 import re
 
 
@@ -56,9 +57,13 @@ def previous_events_api():
     return jsonify({'event_list': event_list, 'pagination': pagination_info}) 
 
 @events_blueprint.route('/event/<title>')
-def fight_info(title): 
+def fight_card_details_and_results(title): 
     query = Fight.query.filter(Fight.event_title_cleaned == title).order_by(Fight.fight_weight).all()
-    fights = [fight.json() for fight in query]
+    date_query = Event.query.filter(Event.title == getattr(query[0], 'event_title')).first()
+    if getattr(date_query, 'date') > date.today():
+        fights = [{k: (v if v is not None else 'TBD') for k, v in fight.json().items()} for fight in query]
+    else:
+        fights = [fight.json() for fight in query]
 
     # title fix
     title = title.replace('-', ' ')

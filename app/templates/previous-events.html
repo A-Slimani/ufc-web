@@ -33,7 +33,7 @@
                 id: "title", 
                 name: "Title",
                 formatter: cell => {
-                    let eventCell = cell.replace(/\s*[-\.]\s*|\s+/g, '-')
+                    let eventCell = cell.replace(/\s*[-\.]\s*|\s+/g, '-');
                     return gridjs.html(`<a href="/event/${eventCell}">${cell}</a>`);
                 }
             },
