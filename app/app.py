@@ -4,7 +4,7 @@ from routes.fighters import fighters_blueprint
 from routes.fights import fights_blueprint
 from routes.events import events_blueprint
 from extensions import db, page_list
-from datetime import date
+from datetime import date, timedelta
 from models import Fight, Event
 import logging
 import dotenv
@@ -32,16 +32,23 @@ url = '/'
 @app.route(url)
 def index():
     # query to get the next event
-    date_query = Event.query.filter(Event.date > date.today()).order_by(Event.date.asc()).first()
+    date_query = Event.query.filter(
+        Event.date >= date.today() - timedelta(days=1)
+    ).order_by(
+        Event.date.asc()
+    ).first()
+
     if date_query:
         next_event: str = date_query.title
     fights_query = Fight.query.filter(Fight.event_title == next_event).all()
+
+    # TODO: run the scraper if it is missing
     
-    next_event_date: date = getattr(date_query, 'date')
+    next_event_date = getattr(date_query, 'date')
     # calculate weeks from now to next event
     delta = next_event_date - date.today()
     weeks_to_event = delta.days // 7
-    if weeks_to_event == 0:
+    if weeks_to_event <= 0:
         weeks_to_event = 'This week'
     else:
         weeks_to_event = f'{weeks_to_event} weeks from now'
