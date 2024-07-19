@@ -28,8 +28,21 @@
     <div id="table"></div>
     <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
     <script>
-        let fighterColumns = [
-                { id: 'name', name: 'Name' },
+        const fighterColumns = [
+                { 
+                    id: 'id', 
+                    name: 'Name', 
+                    formatter: cell => {
+                        let name = cell.split('-').slice(0, -1).join(' ');
+                        for (i = 1; i < name.length; i++){
+                            if (name[i] === name[i].toUpperCase()){
+                                name = name.slice(0, i) + ' ' + name.slice(i);
+                                i++;
+                            }
+                        }
+                        return gridjs.html(`<a href="/fighter/${cell}">${name}</a>`);
+                    }
+                },
                 { id: 'nationality', name: 'Nationality' },
                 { id: 'age', name: 'Age'},
                 { id: 'weight_class', name: 'Weight class'},

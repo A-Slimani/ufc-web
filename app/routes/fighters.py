@@ -64,8 +64,7 @@ def fighters_page_api():
     return jsonify({'fighters': fighters_list, 'pagination': pagination_info})
 
 
-# on hold for now
 @fighters_blueprint.route('/fighter/<id>')
 def fighter_detail(id):
     fighter = Fighter.query.get(id)
-    return render_template('fighter_detail.html', fighter=fighter)
+    return render_template('fighter-profile.html', fighter=fighter)
