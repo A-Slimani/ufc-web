@@ -50,7 +50,12 @@ def fighters_page_api():
     page = request.args.get('page', type=int)
     limit = request.args.get('limit', default=20, type=int)
     paginated_query = query.order_by(Fighter.name).paginate(page=page, per_page=limit, error_out=True)
-    fighters_list = [fighter.json() for fighter in paginated_query.items]
+
+    fighters_list = []
+    for fighter in paginated_query.items:
+        fighter.id = f"{fighter.id}, {fighter.name}" 
+        fighters_list.append(fighter.json())
+
     pagination_info = {
         'page': paginated_query.page,
         'pages': paginated_query.pages,

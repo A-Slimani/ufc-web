@@ -35,9 +35,9 @@
             </tr> 
             {% for fight in fights %}
                 <tr>
-                    <td>{{ fight['left_fighter_name'] }}</td>
+                    <td><a href="/fighter/{{fight['left_fighter_id']}}">{{ fight['left_fighter_name'] }}</a></td>
                     <td>vs</td>
-                    <td>{{ fight['right_fighter_name'] }}</td>
+                    <td><a href="/fighter/{{fight['right_fighter_id']}}">{{ fight['right_fighter_name'] }}</a></td>
                     <td>{{ fight['weight_class'] }}</td>
                 </tr>
             {% endfor %}

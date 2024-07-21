@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, request
 from sqlalchemy import func, case
 from extensions import page_list
 from models import Fight, Event
+from datetime import date
 
 fights_blueprint = Blueprint('fights', __name__)
 
@@ -55,9 +56,9 @@ def previous_fights_api():
             else:
                 query = query.order_by(None).order_by(getattr(Fight, column_name).desc())
     
-    # sorting fights by card order
-    query = query.order_by(Fight.fight_weight.asc())
-        
+    # sorting fights by card order and filtering out future events
+    query = query.filter(Event.date < date.today()).order_by(Fight.fight_weight.asc())
+
     # pagination
     page = request.args.get('page', type=int)
     paginated_query = query.paginate(page=page, per_page=limit, error_out=True)

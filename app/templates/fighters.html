@@ -33,17 +33,8 @@
                     id: 'id', 
                     name: 'Name', 
                     formatter: cell => {
-                        let name = cell.split('-').slice(0, -1);
-                        for (let i = 0; i < name.length; i++){
-                            for (let j = 1; j < name[i].length; j++){
-                                if (name[i][j] === name[i][j].toUpperCase() 
-                                    && name[i][j-1] !== name[i][j - 1].toUpperCase()){
-                                    name[i] = name[i].slice(0, j) + '-' + name[i].slice(j);
-                                }
-                            }
-                        }
-                        name = name.join(' ')
-                        return gridjs.html(`<a href="/fighter/${cell}">${name}</a>`);
+                        const val = cell.split(',')
+                        return gridjs.html(`<a href="/fighter/${val[0]}">${val[1]}</a>`);
                     }
                 },
                 { id: 'nationality', name: 'Nationality' },
