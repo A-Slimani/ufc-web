@@ -42,8 +42,6 @@ def index():
         next_event: str = date_query.title
     fights_query = Fight.query.filter(Fight.event_title == next_event).all()
 
-    # TODO: run the scraper if it is missing
-    
     next_event_date = getattr(date_query, 'date')
     # calculate weeks from now to next event
     delta = next_event_date - date.today()
