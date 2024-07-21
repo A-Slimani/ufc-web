@@ -10,5 +10,6 @@
     - Create the info page
     - Gather more data for each fighter
 - Host it on local server
+- Test
 
 
