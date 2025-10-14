@@ -1,5 +1,10 @@
 # UFC website simplified 
 
+## How to start project for dev 
+- Enter app directory
+- 
+
+
 ## TODO
 - Fix catchweights?
     - unsure how to go about this one

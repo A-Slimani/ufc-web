@@ -5,4 +5,6 @@ test.py
 *.sql
 .venv
 .env
-
+.envrc
+.fleet/*
+.idea/*

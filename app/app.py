@@ -20,7 +20,7 @@ db_port = os.getenv('DB_PORT')
 db_name = os.getenv('DB_NAME')
 
 app = Flask(__name__, template_folder='templates')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}'
 
 db.init_app(app)
 
@@ -43,6 +43,7 @@ def index():
     fights_query = Fight.query.filter(Fight.event_title == next_event).all()
 
     next_event_date = getattr(date_query, 'date')
+
     # calculate weeks from now to next event
     delta = next_event_date - date.today()
     weeks_to_event = delta.days // 7
