@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UFC Archive</title>
+  <title>{{ site_title }}</title>
   <meta name="ufc archive website" content="previous events and fighters info" />
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
 </head>
 <header>
-  <h1>UFC ARCHIVE</h1>
+  <h1>{{ site_title }}</h1>
   <div class="menu">
     {% set ns = namespace(c=0) %}
     {% for page in page_list %}
@@ -37,17 +37,17 @@
       {% for fight in fights %}
         <tr>
           {% if fight['r_fighter_status'] == 'Win' %}
-            <td>{{ fight['r_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['r_fighter_id'] }}">{{ fight['r_fighter_name'] }}</a></td>
             <td>def. </td>
-            <td>{{ fight['b_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['b_fighter_id'] }}">{{ fight['b_fighter_name'] }}</a></td>
           {% elif fight['b_fighter_status'] == 'Win' %}
-            <td>{{ fight['b_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['b_fighter_id'] }}">{{ fight['b_fighter_name'] }}</a></td>
             <td>def. </td>
-            <td>{{ fight['r_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['r_fighter_id'] }}">{{ fight['r_fighter_name'] }}</a></td>
           {% else %}
-            <td>{{ fight['r_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['r_fighter_id'] }}">{{ fight['r_fighter_name'] }}</a></td>
             <td>{{ fight['r_fighter_status'] }}</td>
-            <td>{{ fight['b_fighter_name'] }}</td>
+            <td><a href="/fighter/{{ fight['b_fighter_id'] }}">{{ fight['b_fighter_name'] }}</a></td>
           {% endif %}
           <td>{{fight['bout_weight']}}</td>
           <td>{{fight['method']}}</td>
@@ -58,5 +58,4 @@
     </table>
   </div>
 </body>
-</head>
 </html>

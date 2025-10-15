@@ -6,6 +6,7 @@ from routes.fighters import fighters_blueprint
 from extensions import db, page_list
 from datetime import date, timedelta
 from models import Event, Fight, Fighter
+from sqlalchemy import func
 import logging
 import dotenv
 import os
@@ -28,11 +29,26 @@ app.register_blueprint(events_blueprint)
 app.register_blueprint(fights_blueprint)
 app.register_blueprint(fighters_blueprint)
 
+@app.context_processor
+def inject_globals():
+    return {
+        'site_title': "UFC ARCHIVE"
+    }
+
+
 url = '/'
 @app.route(url)
 def index():
+    previous_event_query = Event.query.filter(Event.date < func.current_date()).order_by(Event.date.desc()).first()
+
+    fight_query = Fight.query.filter(Fight.event_id == previous_event_query.id).order_by(Fight.fight_order).all()
+
+    fights = [f.json() for f in fight_query]
+
     return render_template(
         'index.html',
         page_list=page_list,
-        url=url
+        url=url,
+        fight_title=previous_event_query.name,
+        fights=fights
     )

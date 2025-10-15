@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UFC Archive</title>
+  <title>{{ site_title }}</title>
   <meta name="ufc archive website" content="previous events and fighters info" />
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>
 </head>
 <header>
-  <h1>UFC</h1>
+  <h1>{{ site_title }}</h1>
   <h2>Fighters</h2>
 </header>
 <body class="container">
@@ -45,44 +45,44 @@
         { id: 'ufc_losses', name: 'UFC Losses'}
       ]
       new gridjs.Grid({
-          columns: fighterColumns, 
-          sort: {
-              server: {
-                  url: (prev, columns) => {
-                      if (!columns.length) return prev;
-  
-                      const col = columns[0];
-                      const dir = col.direction === 1 ? 'asc' : 'desc';
-                      let colName = fighterColumns[col.index].id;
-  
-                      const separator = prev.includes('?') ? '&' : '?';
-  
-                      return `${prev}${separator}col=${colName}&dir=${dir}`;
-                  }
-              }
-          },
-          pagination: {
-              limit: 20,
-              server: {
-                  url: (prev, page, limit) => {
-                      const separator = prev.includes('?') ? '&' : '?';
-                      return `${prev}${separator}page=${page + 1}&limit=${limit}`;
-                  },
-              }
-          },
-          search: {
-              server: {
-                  url: (prev, keyword) => {
-                      const separator = prev.includes('?') ? '&' : '?';
-                      return `${prev}${separator}search=${keyword}`;
-                  }
-              }
-          },
+        columns: fighterColumns, 
+        sort: {
           server: {
-              url: '/api/fighters',
-              then: data => data.fighters,
-              total: data => data.pagination?.total,
+            url: (prev, columns) => {
+              if (!columns.length) return prev;
+  
+              const col = columns[0];
+              const dir = col.direction === 1 ? 'asc' : 'desc';
+              let colName = fighterColumns[col.index].id;
+  
+              const separator = prev.includes('?') ? '&' : '?';
+  
+              return `${prev}${separator}col=${colName}&dir=${dir}`;
+            }
           }
+        },
+        pagination: {
+          limit: 20,
+          server: {
+            url: (prev, page, limit) => {
+              const separator = prev.includes('?') ? '&' : '?';
+              return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+            },
+          }
+        },
+        search: {
+          server: {
+            url: (prev, keyword) => {
+              const separator = prev.includes('?') ? '&' : '?';
+              return `${prev}${separator}search=${keyword}`;
+            }
+          }
+        },
+        server: {
+          url: '/api/fighters',
+          then: data => data.fighters,
+          total: data => data.pagination?.total,
+        }
       }).render(document.getElementById("table"));
   </script>
 </body>

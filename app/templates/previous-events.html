@@ -2,93 +2,93 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UFC Archive</title>
+  <title>{{ site_title }}</title>
   <meta name="ufc archive website" content="previous events and fighters info" />
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
 </head>
 <header>
-  <h1>UFC</h1>
+  <h1>{{ site_title }}</h1>
   <h2>Previous Events</h2>
 </header>
 <body class="container">
-    <div class="menu">
-      {% set ns = namespace(c = 1) %}
-      {% for page in page_list %}
-        {% if page['url'] != url %}
-          <a href="{{ page['url'] }}">{{ page.title }}</a>
-          {% set ns.c = ns.c + 1%}
-          {% if ns.c < page_list|length %}
-            <span> | </span>
-          {% endif %}
+  <div class="menu">
+    {% set ns = namespace(c = 1) %}
+    {% for page in page_list %}
+      {% if page['url'] != url %}
+        <a href="{{ page['url'] }}">{{ page.title }}</a>
+        {% set ns.c = ns.c + 1%}
+        {% if ns.c < page_list|length %}
+          <span> | </span>
         {% endif %}
-      {% endfor %}
-    </div>
-    <div id="table"></div>
-    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
-    <script>
-      let event_columns = [
-        {id: "id", name: "id", hidden: true},
-        { 
-          id: "name", 
-          name: "Title",
-          formatter: (cell, row) => {
-            const eventId = row._cells[0].data
-            return gridjs.html(`<a href="/event/${eventId}">${cell}</a>`);
-          }
-        },
-        { id: "date", name: "Date" },
-        { state: "city", name: "City"},
-        { state: "state", name: "State"},
-        { state: "country", name: "Country"},
-        { state: "venue", name: "Venue"},
-      ] 
-      new gridjs.Grid({
-        columns: event_columns,
-        sort: {
-          server: {
-            url: (prev, columns) => {
-              if (!columns.length) return prev;
-
-              const col = columns[0];
-              const dir = col.direction === 1 ? "asc" : "desc";
-              let colName = event_columns[col.index].id;
-
-              const separator = prev.includes("?") ? "&" : "?";
-
-              return `${prev}${separator}col=${colName}&dir=${dir}`;
-            }
-          }
-        },
-        search: {
-          server: {
-            url: (prev, keyword) => {
-              const separator = prev.includes("?") ? "&" : "?";
-              return `${prev}${separator}search=${keyword}`;
-            }
-          },
-        },
-        pagination: {
-          limit: 15,
-          server: {
-            url: (prev, page, limit) => {
-              const separator = prev.includes("?") ? "&" : "?";
-              return `${prev}${separator}page=${page + 1}&limit=${limit}`;
-            },
-          }
-        },
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div id="table"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    let event_columns = [
+      {id: "id", name: "id", hidden: true},
+      { 
+        id: "name", 
+        name: "Title",
+        formatter: (cell, row) => {
+          const eventId = row._cells[0].data
+          return gridjs.html(`<a href="/event/${eventId}">${cell}</a>`);
+        }
+      },
+      { id: "date", name: "Date" },
+      { state: "city", name: "City"},
+      { state: "state", name: "State"},
+      { state: "country", name: "Country"},
+      { state: "venue", name: "Venue"},
+    ] 
+    new gridjs.Grid({
+      columns: event_columns,
+      sort: {
         server: {
-          url: '/api/previous-events',
-          then: data => data.event_list,
-          total: data => data.pagination?.total,
-        },
-        language: {
-          'search': {
-            'placeholder': 'Search by event name'
+          url: (prev, columns) => {
+            if (!columns.length) return prev;
+
+            const col = columns[0];
+            const dir = col.direction === 1 ? "asc" : "desc";
+            let colName = event_columns[col.index].id;
+
+            const separator = prev.includes("?") ? "&" : "?";
+
+            return `${prev}${separator}col=${colName}&dir=${dir}`;
           }
         }
-      }).render(document.getElementById("table"));
-    </script>
+      },
+      search: {
+        server: {
+          url: (prev, keyword) => {
+            const separator = prev.includes("?") ? "&" : "?";
+            return `${prev}${separator}search=${keyword}`;
+          }
+        },
+      },
+      pagination: {
+        limit: 15,
+        server: {
+          url: (prev, page, limit) => {
+            const separator = prev.includes("?") ? "&" : "?";
+            return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+          },
+        }
+      },
+      server: {
+        url: '/api/previous-events',
+        then: data => data.event_list,
+        total: data => data.pagination?.total,
+      },
+      language: {
+        'search': {
+          'placeholder': 'Search by event name'
+        }
+      }
+    }).render(document.getElementById("table"));
+  </script>
 </body>
 </html>

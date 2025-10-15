@@ -1,18 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>UFC Archive</title>
-    <meta name="ufc archive website" content="previous events and fighters info" />
-    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
+  <meta charset="UTF-8">
+  <title>{{ site_title }}</title>
+  <meta name="ufc archive website" content="previous events and fighters info" />
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
 </head>
 <header>
-    <h1>UFC</h1>
-    <h2>placeholder</h2>
+  <h1>{{ site_title }}</h1>
+  <div class="menu">
+    {% set ns = namespace(c=0) %}
+    {% for page in page_list %}
+      {% if page['url'] != page_name %}
+        <a href="{{ page['url'] }}">{{ page.title }}</a>
+        {% set ns.c = ns.c + 1%}
+        {% if ns.c < page_list|length %}
+          <span> | </span>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
 </header>
-<body>
-    <p>In progress...</p>
+<body class="container">
+  <div>
+    {% if fighter.nick_name %}
+    <h2>{{ fighter.full_name }}</h2>
+    <h3>"{{ fighter.nick_name }}"</h3>
+    {% endif %}
+    
+    <table class="table">
+      <tr>
+        <th colspan="2">Basic Information</th>
+      </tr>
+      <tr>
+        <td>Age</td>
+        <td>{{ fighter.age if fighter.age else 'N/A' }}</td>
+      </tr>
+      <tr>
+        <td>Weight Class</td>
+        <td>{{ fighter.weight_class_description if fighter.weight_class_description else 'N/A' }}</td>
+      </tr>
+      <tr>
+        <td>Last Active</td>
+        <td>{{ fighter.last_active.strftime('%B %d, %Y') if fighter.last_active else 'N/A' }}</td>
+      </tr>
+    </table>
+
+    <div style="display: flex">
+      <table class="table">
+        <tr>
+          <th>Fight Record</th>
+        </tr>
+        <tr>
+          <td>Wins</td>
+          <td>{{ fighter.ufc_wins }}</td>
+        </tr>
+        <tr>
+          <td>Losses</td>
+          <td>{{ fighter.ufc_losses }}</td>
+        </tr>
+      </table>
+
+      <table class="table">
+        <tr>
+          <th colspan="2">Win Methods</th>
+        </tr>
+        <tr>
+          <td>Wins by KO/TKO</td>
+          <td>{{ fighter.ufc_wins_by_ko_tko }}</td>
+        </tr>
+        <tr>
+          <td>Wins by Submission</td>
+          <td>{{ fighter.ufc_wins_by_sub }}</td>
+        </tr>
+        <tr>
+          <td>Wins by Decision</td>
+          <td>{{ fighter.ufc_wins_by_dec }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 </body>
-</html> 
+</html>
