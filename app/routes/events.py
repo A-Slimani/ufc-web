@@ -6,7 +6,7 @@ from datetime import date
 import re
 
 
-events_blueprint = Blueprint('events', __name__)
+events_blueprint = Blueprint('dim_events', __name__)
 
 url = '/previous-events'
 @events_blueprint.route(url)
@@ -22,7 +22,7 @@ def previous_events_api():
     # searching
     search_query = request.args.get('search', default=None, type=str)
     if search_query:
-        query = query.filter(func.lower(Event.title).like(f'%{search_query.lower()}%'))
+        query = query.filter(func.lower(Event.name).like(f'%{search_query.lower()}%'))
         event_list = [fighter.json() for fighter in query] 
     
     # sorting
@@ -56,17 +56,14 @@ def previous_events_api():
 
     return jsonify({'event_list': event_list, 'pagination': pagination_info}) 
 
-@events_blueprint.route('/event/<title>')
-def fight_card_details_and_results(title): 
-    query = Fight.query.filter(Fight.event_title_cleaned == title).order_by(Fight.fight_weight).all()
-    date_query = Event.query.filter(Event.title == getattr(query[0], 'event_title')).first()
-    if getattr(date_query, 'date') > date.today():
-        fights = [{k: (v if v is not None else 'TBD') for k, v in fight.json().items()} for fight in query]
-    else:
-        fights = [fight.json() for fight in query]
 
-    # title fix
-    title = title.replace('-', ' ')
-    title = re.sub(r'(?<=\d)(?=\D)', ':', title)
+@events_blueprint.route('/event/<id>')
+def fight_card_details_and_results(id):
+    query = Fight.query.filter(Fight.event_id == int(id)).order_by(Fight.fight_order).all()
 
-    return render_template('fight-data.html', title=title, fights=fights, url='/fight-data', page_list=page_list)
+    title_query = Event.query.filter(Event.id == getattr(query[0], 'event_id')).first()
+    title_name = title_query.name
+
+    fights = [fight.json() for fight in query]
+
+    return render_template('fight-data.html', title=title_name, fights=fights, url='/fight-data', page_list=page_list)

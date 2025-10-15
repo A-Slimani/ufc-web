@@ -15,75 +15,76 @@
 </header>
 
 <body class="container">
-    <div class="menu">
-        {% set ns = namespace(c=1) %}
-        {% for page in page_list %}
-            {% if page['url'] != url %}
-                <a href="{{ page['url'] }}">{{ page.title }}</a>
-                {% set ns.c = ns.c + 1 %}
-                {% if ns.c < page_list|length %}
-                    <span> | </span>
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    </div>
-    <div id="table"></div>
-    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
-    <script>
-        let fight_columns = [
-            { 
-                id: "event_title", 
-                name: "Event",
-                formatter: cell => {
-                    let eventCell = cell.replace(/\s*[-\.]\s*|\s+/g, '-');
-                    return gridjs.html(`<a href="/event/${eventCell}">${cell}</a>`);
-                },
-            },
-            { id: "left_fighter_name", name: "Fighter" },
-            { id: "status", name: "Status" },
-            { id: "right_fighter_name", name: "Fighter" },
-            { id: "method", name: "Method" },
-            { id: "round", name: "Round"}
-        ]
-        new gridjs.Grid({
-            columns: fight_columns,
-            sort: {
-                server: {
-                    url: (prev, columns) => {
-                        if (!columns.length) return prev;
+  <div class="menu">
+    {% set ns = namespace(c=1) %}
+    {% for page in page_list %}
+      {% if page['url'] != url %}
+        <a href="{{ page['url'] }}">{{ page.title }}</a>
+        {% set ns.c = ns.c + 1 %}
+        {% if ns.c < page_list|length %}
+          <span> | </span>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div id="table"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    let fight_columns = [
+      {id: "event_id", name: "id", hidden: true},
+      { 
+        id: "event_name", 
+        name: "Event",
+        formatter: (cell, row) => {
+          const eventId = row._cells[0].data
+          return gridjs.html(`<a href="/event/${eventId}">${cell}</a>`);
+        }
+      },
+      { id: "r_fighter_name", name: "Fighter" },
+      { id: "r_fighter_status", name: "Status" },
+      { id: "b_fighter_name", name: "Fighter" },
+      { id: "b_fighter_status", name: "Status" },
+      { id: "method", name: "Method" },
+    ]
+    new gridjs.Grid({
+      columns: fight_columns,
+      sort: {
+        server: {
+          url: (prev, columns) => {
+            if (!columns.length) return prev;
 
-                        const col = columns[0];
-                        const dir = col.direction === 1 ? "asc" : "desc";
-                        let colName = fight_columns[col.index].id;
+            const col = columns[0];
+            const dir = col.direction === 1 ? "asc" : "desc";
+            let colName = fight_columns[col.index].id;
 
-                        const separator = prev.includes("?") ? "&" : "?";
+            const separator = prev.includes("?") ? "&" : "?";
 
-                        return `${prev}${separator}col=${colName}&dir=${dir}`;
-                    }
-                }
-            },
-            search: {
-                server: {
-                    url: (prev, keyword) => {
-                        const separator = prev.includes("?") ? "&" : "?";
-                        return `${prev}${separator}search=${keyword}`;
-                    }
-                }
-            },
-            pagination: {
-                limit: 15,
-                server: {
-                    url: (prev, page, limit) => {
-                        const separator = prev.includes("?") ? "&" : "?";
-                        return `${prev}${separator}page=${page + 1}&limit=${limit}`;
-                    },
-                }
-            },
-            server: {
-                url: "/api/previous-fights",
-                then: data => data.fights,
-                total: data => data.pagination?.total, 
-            }
-        }).render(document.getElementById("table"));
-    </script>
+            return `${prev}${separator}col=${colName}&dir=${dir}`;
+          }
+        }
+      },
+      search: {
+        server: {
+          url: (prev, keyword) => {
+            const separator = prev.includes("?") ? "&" : "?";
+            return `${prev}${separator}search=${keyword}`;
+          }
+        }
+      },
+      pagination: {
+        limit: 15,
+        server: {
+          url: (prev, page, limit) => {
+            const separator = prev.includes("?") ? "&" : "?";
+            return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+          },
+        }
+      },
+      server: {
+        url: "/api/previous-fights",
+        then: data => data.fights,
+        total: data => data.pagination?.total, 
+      }
+    }).render(document.getElementById("table"));
+  </script>
 </body>

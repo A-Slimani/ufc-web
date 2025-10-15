@@ -24,23 +24,5 @@
             {% endif %}
         {% endfor %}
     </div>
-    <br />
-    <div class="container">
-        <!-- TODO: create an alternative if missing showing some info that its scraping again -->
-        <h3>{{ weeks_to_event }} :: {{ fights[0]['event_title'] }}</h3> 
-        <table class="table">
-            <tr>
-                <th colspan="3">Fight</th> 
-                <th>Weight Class</th>
-            </tr> 
-            {% for fight in fights %}
-                <tr>
-                    <td><a href="/fighter/{{fight['left_fighter_id']}}">{{ fight['left_fighter_name'] }}</a></td>
-                    <td>vs</td>
-                    <td><a href="/fighter/{{fight['right_fighter_id']}}">{{ fight['right_fighter_name'] }}</a></td>
-                    <td>{{ fight['weight_class'] }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
+    <p>In progress... select another menu option</p>
 </body>

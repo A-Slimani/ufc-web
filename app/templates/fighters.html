@@ -1,87 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>UFC Archive</title>
-    <meta name="ufc archive website" content="previous events and fighters info" />
-    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>
+  <meta charset="UTF-8">
+  <title>UFC Archive</title>
+  <meta name="ufc archive website" content="previous events and fighters info" />
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>
 </head>
 <header>
-    <h1>UFC</h1>
-    <h2>Fighters</h2>
+  <h1>UFC</h1>
+  <h2>Fighters</h2>
 </header>
 <body class="container">
-    <div class="menu">
-        {% set ns = namespace(c=1) %}
-        {% for page in page_list %}
-            {% if page['url'] != url %}
-                <a href="{{ page['url'] }}">{{ page.title }}</a>
-                {% set ns.c = ns.c + 1%}
-                {% if ns.c < page_list|length %}
-                    <span> | </span>
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    </div>
-    <div id="table"></div>
-    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
-    <script>
-        const fighterColumns = [
-                { 
-                    id: 'id', 
-                    name: 'Name', 
-                    formatter: cell => {
-                        const val = cell.split(',')
-                        return gridjs.html(`<a href="/fighter/${val[0]}">${val[1]}</a>`);
-                    }
-                },
-                { id: 'nationality', name: 'Nationality' },
-                { id: 'age', name: 'Age'},
-                { id: 'weight_class', name: 'Weight class'},
-                { id: 'wins', name: 'Wins'},
-                { id: 'losses', name: 'Losses'}
-        ]
-        new gridjs.Grid({
-            columns: fighterColumns, 
-            sort: {
-                server: {
-                    url: (prev, columns) => {
-                        if (!columns.length) return prev;
-
-                        const col = columns[0];
-                        const dir = col.direction === 1 ? 'asc' : 'desc';
-                        let colName = fighterColumns[col.index].id;
-
-                        const separator = prev.includes('?') ? '&' : '?';
-
-                        return `${prev}${separator}col=${colName}&dir=${dir}`;
-                    }
-                }
-            },
-            pagination: {
-                limit: 20,
-                server: {
-                    url: (prev, page, limit) => {
-                        const separator = prev.includes('?') ? '&' : '?';
-                        return `${prev}${separator}page=${page + 1}&limit=${limit}`;
-                    },
-                }
-            },
-            search: {
-                server: {
-                    url: (prev, keyword) => {
-                        const separator = prev.includes('?') ? '&' : '?';
-                        return `${prev}${separator}search=${keyword}`;
-                    }
-                }
-            },
-            server: {
-                url: '/api/fighters',
-                then: data => data.fighters,
-                total: data => data.pagination?.total,
-            }
-        }).render(document.getElementById("table"));
-    </script>
+  <div class="menu">
+    {% set ns = namespace(c=1) %}
+    {% for page in page_list %}
+      {% if page['url'] != url %}
+        <a href="{{ page['url'] }}">{{ page.title }}</a>
+        {% set ns.c = ns.c + 1%}
+        {% if ns.c < page_list|length %}
+          <span> | </span>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div id="table"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+      const fighterColumns = [
+        { id: 'fighter_id', hidden: true },
+        { 
+          id: 'full_name', 
+          name: 'Name', 
+          formatter: (cell, row) => {
+            const id = row._cells[0].data
+            return gridjs.html(`<a href="/fighter/${id}">${cell}</a>`);
+          }
+        },
+        { id: 'last_active', name: 'Last Active'},
+        { id: 'age', name: 'Age'},
+        { id: 'weight_class_description', name: 'Weight class'},
+        { id: 'ufc_wins', name: 'UFC Wins'},
+        { id: 'ufc_losses', name: 'UFC Losses'}
+      ]
+      new gridjs.Grid({
+          columns: fighterColumns, 
+          sort: {
+              server: {
+                  url: (prev, columns) => {
+                      if (!columns.length) return prev;
+  
+                      const col = columns[0];
+                      const dir = col.direction === 1 ? 'asc' : 'desc';
+                      let colName = fighterColumns[col.index].id;
+  
+                      const separator = prev.includes('?') ? '&' : '?';
+  
+                      return `${prev}${separator}col=${colName}&dir=${dir}`;
+                  }
+              }
+          },
+          pagination: {
+              limit: 20,
+              server: {
+                  url: (prev, page, limit) => {
+                      const separator = prev.includes('?') ? '&' : '?';
+                      return `${prev}${separator}page=${page + 1}&limit=${limit}`;
+                  },
+              }
+          },
+          search: {
+              server: {
+                  url: (prev, keyword) => {
+                      const separator = prev.includes('?') ? '&' : '?';
+                      return `${prev}${separator}search=${keyword}`;
+                  }
+              }
+          },
+          server: {
+              url: '/api/fighters',
+              then: data => data.fighters,
+              total: data => data.pagination?.total,
+          }
+      }).render(document.getElementById("table"));
+  </script>
 </body>

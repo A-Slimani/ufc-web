@@ -13,12 +13,12 @@ def fighter_list():
 @fighters_blueprint.route('/api/fighters')
 def fighters_page_api():
     # base query
-    query = Fighter.query.order_by(Fighter.name)
+    query = Fighter.query.order_by(Fighter.last_active)
 
     # searching
     search_query = request.args.get('search', default=None, type=str)
     if search_query:
-        query = query.filter(func.lower(Fighter.name).like(f'%{search_query.lower()}%'))
+        query = query.filter(func.lower(Fighter.full_name).like(f'%{search_query.lower()}%'))
         fighters_list = [fighter.json() for fighter in query]
     
     # sorting
@@ -49,11 +49,11 @@ def fighters_page_api():
     # pagination
     page = request.args.get('page', type=int)
     limit = request.args.get('limit', default=20, type=int)
-    paginated_query = query.order_by(Fighter.name).paginate(page=page, per_page=limit, error_out=True)
+    paginated_query = query.order_by(Fighter.last_active).paginate(page=page, per_page=limit, error_out=True)
 
     fighters_list = []
     for fighter in paginated_query.items:
-        fighter.id = f"{fighter.id}, {fighter.name}" 
+        fighter.id = f"{fighter.fighter_id}, {fighter.full_name}" 
         fighters_list.append(fighter.json())
 
     pagination_info = {
@@ -71,5 +71,8 @@ def fighters_page_api():
 
 @fighters_blueprint.route('/fighter/<id>')
 def fighter_detail(id):
-    fighter = Fighter.query.get(id)
+    fighter_id = int(id)
+    fighter = Fighter.query.get(fighter_id)
+
     return render_template('fighter-profile.html', fighter=fighter)
+

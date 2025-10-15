@@ -11,6 +11,7 @@ url = '/previous-fights'
 def previous_events():
     return render_template(f'/{url}.html', page_list=page_list, url=url)
 
+
 @fights_blueprint.route('/api/previous-fights')
 def previous_fights_api():
     # base query
@@ -19,10 +20,11 @@ def previous_fights_api():
     # search
     search_query = request.args.get('search', default=None, type=str)
     limit = request.args.get('limit', default=20, type=int)
+
     if search_query:
         query = query.filter(func.lower(Fight.event_title).like(f'%{search_query.lower()}%'))
         fight_list = [fight.json() for fight in query]
-    
+
     # sorting
     column_name = request.args.get('col', type=str)
     direction = request.args.get('dir', type=str)
@@ -31,8 +33,8 @@ def previous_fights_api():
             if column_name == 'event_title':
                 query = query.order_by(None).order_by(Event.date.asc()).order_by()
             elif column_name == 'status':
-                query = query.order_by(None).order_by(Fight.left_status.asc())
-            elif column_name == 'weight_class':
+                query = query.order_by(None).order_by(Fight.r_fighter_status.asc())
+            elif column_name == 'bout_weight':
                 query = query.order_by(None).order_by(
                     case(
                         Fight.WEIGHT_CLASSES,
@@ -45,7 +47,7 @@ def previous_fights_api():
             if column_name == 'event_title':
                 query = query.order_by(None).order_by(Event.date.desc())
             elif column_name == 'status':
-                query = query.order_by(None).order_by(Fight.left_status.desc())
+                query = query.order_by(None).order_by(Fight.r_fighter_status.desc())
             elif column_name == 'weight_class':
                 query = query.order_by(None).order_by(
                     case(
@@ -55,23 +57,17 @@ def previous_fights_api():
                 )
             else:
                 query = query.order_by(None).order_by(getattr(Fight, column_name).desc())
-    
+
     # sorting fights by card order and filtering out future events
-    query = query.filter(Event.date < date.today()).order_by(Fight.fight_weight.asc())
+    query = query.filter(Event.date < date.today()).order_by(Fight.bout_weight.asc())
 
     # pagination
     page = request.args.get('page', type=int)
     paginated_query = query.paginate(page=page, per_page=limit, error_out=True)
-    fight_list = []
-    for fight in paginated_query.items:
-        fight_item = fight.json()
-        if fight.left_status == 'win':
-            fight_item['status'] = 'def.'
-        elif fight.left_status == 'draw':
-            fight_item['status'] = 'draw'
-        elif fight.left_status == 'NC':
-            fight_item['status'] = 'NC'
-        fight_list.append(fight_item) 
+
+    # final fight_list
+    fight_list = [fight.json() for fight in paginated_query.items]
+
     pagination_info = {
         'page': paginated_query.page,
         'pages': paginated_query.pages,
@@ -86,3 +82,4 @@ def previous_fights_api():
         'fights': fight_list,
         'pagination': pagination_info
     }) 
+

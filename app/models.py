@@ -1,118 +1,105 @@
 from extensions import db
 
+class Event(db.Model):
+    __tablename__ = 'dim_events'
+    __table_args__ = {'schema': 'dbt_schema'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    date = db.Column(db.DateTime)
+    city = db.Column(db.String)
+    state = db.Column(db.String)
+    country = db.Column(db.String)
+    venue = db.Column(db.String)
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "date": self.date,
+            "city": self.city,
+            "state": self.state,
+            "country": self.country,
+            "venue": self.venue,
+        }
+
+class Fight(db.Model):
+    __tablename__ = 'fact_fights'
+    __table_args__ = {'schema': 'dbt_schema'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('dbt_schema.dim_events.id'))
+    r_fighter_id = db.Column(db.Integer)
+    r_fighter_name = db.Column(db.String)
+    r_fighter_status = db.Column(db.String)
+    b_fighter_id = db.Column(db.Integer)
+    b_fighter_name = db.Column(db.String)
+    b_fighter_status = db.Column(db.String)
+    bout_weight = db.Column(db.String) 
+    method = db.Column(db.String)
+    ending_round = db.Column(db.Integer)
+    bout_rounds = db.Column(db.Integer)
+    time = db.Column(db.String)
+    fight_order = db.Column(db.Integer)
+
+    event = db.relationship('Event', backref=db.backref('fact_fights', lazy=True))
+
+    def json(self):
+        return {
+            'id': self.id,
+            'event_id': self.event_id,
+            'event_name': self.event.name,
+            'r_fighter_id': self.r_fighter_id,
+            'r_fighter_name': self.r_fighter_name,
+            'r_fighter_status': self.r_fighter_status,
+            'b_fighter_id': self.b_fighter_id,
+            'b_fighter_name': self.b_fighter_name,
+            'b_fighter_status': self.b_fighter_status,
+            'bout_weight': self.bout_weight,
+            'method': self.method,
+            'ending_round': self.ending_round,
+            'bout_rounds': self.bout_rounds,
+            'time': self.time,
+            'fight_order': self.fight_order
+        }
+
 
 class Fighter(db.Model):
-    __tablename__ = 'fighters'
+    __tablename__ = 'dim_fighters'
+    __table_args__ = {'schema': 'dbt_schema'}
 
-    id = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String)
-    nationality = db.Column(db.String, nullable=True)
-    locality = db.Column(db.String, nullable=True)
+    fighter_id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String)
+    nick_name = db.Column(db.String)
+    # nationality = db.Column(db.String, nullable=True)
+    # locality = db.Column(db.String, nullable=True)
     age = db.Column(db.Integer, nullable=True)
-    weight_class = db.Column(db.String, nullable=True)
-    wins = db.Column(db.Integer)
-    wins_by_ko_tko = db.Column(db.Integer)
-    wins_by_sub = db.Column(db.Integer)
-    wins_by_dec = db.Column(db.Integer)
-    losses = db.Column(db.Integer)
-    losses_by_ko_tko = db.Column(db.Integer)
-    losses_by_sub = db.Column(db.Integer)
-    losses_by_dec = db.Column(db.Integer)
+    weight_class_id = db.Column(db.Integer)
+    weight_class_description = db.Column(db.String, nullable=True)
+    last_active = db.Column(db.Date)
+    ufc_wins = db.Column(db.Integer)
+    ufc_wins_by_ko_tko = db.Column(db.Integer)
+    ufc_wins_by_sub = db.Column(db.Integer)
+    ufc_wins_by_dec = db.Column(db.Integer)
+    ufc_losses = db.Column(db.Integer)
 
-    WEIGHT_CLASSES = {
-        'Strawweight': 1,
-        'Flyweight': 5,
-        'Bantamweight': 6,
-        'Featherweight': 7,
-        'Lightweight': 8,
-        'Welterweight': 9,
-        'Middleweight': 10,
-        'Light Heavyweight': 11,
-        'Heavyweight': 12,
-        'Super Heavyweight': 13,
-    }
 
     def __repr__(self):
         return f'<Fighter {self.id}>'
 
     def json(self):
         return {
-            'id': self.id,
-            'name': self.name,
-            'nationality': self.nationality,
-            'locality': self.locality,
+            'fighter_id': self.fighter_id,
+            'full_name': self.full_name,
+            # 'nationality': self.nationality,
+            # 'locality': self.locality,
             'age': self.age,
-            'weight_class': self.weight_class,
-            'wins': self.wins,
-            'wins_by_ko_tko': self.wins_by_ko_tko,
-            'wins_by_sub': self.wins_by_sub,
-            'wins_by_dec': self.wins_by_dec,
-            'losses': self.losses,
-            'losses_by_ko_tko': self.losses_by_ko_tko,
-            'losses_by_sub': self.losses_by_sub,
-            'losses_by_dec': self.losses_by_dec,
+            'last_active': self.last_active,
+            'weight_class_id': self.weight_class_id,
+            'weight_class_description': self.weight_class_description,
+            'ufc_wins': self.ufc_wins,
+            'ufc_wins_by_ko_tko': self.ufc_wins_by_ko_tko,
+            'ufc_wins_by_sub': self.ufc_wins_by_sub,
+            'ufc_wins_by_dec': self.ufc_wins_by_dec,
+            'ufc_losses': self.ufc_losses,
         }
-        
-
-class Fight(db.Model):
-    __tablename__ = "fights"
-
-    id = db.Column(db.String, primary_key=True)
-    event = db.relationship('Event', backref=db.backref('fights', lazy=True))
-    event_title = db.Column(db.String, db.ForeignKey('events.title'))
-    event_title_cleaned = db.Column(db.String)
-    left_fighter_id = db.Column(db.String, db.ForeignKey('fighters.id'))
-    left_fighter_name = db.Column(db.String, nullable=True)
-    left_status = db.Column(db.String)
-    right_fighter_id = db.Column(db.String, db.ForeignKey('fighters.id'))
-    right_fighter_name = db.Column(db.String, nullable=True)
-    right_status = db.Column(db.String)
-    weight_class = db.Column(db.String, nullable=True)
-    fight_weight = db.Column(db.Integer)
-    method = db.Column(db.String)
-    round = db.Column(db.Integer, nullable=True)
-    time = db.Column(db.String)
-
-    WEIGHT_CLASSES = {
-        'Strawweight': 1,
-        'Flyweight': 5,
-        'Bantamweight': 6,
-        'Featherweight': 7,
-        'Lightweight': 8,
-        'Welterweight': 9,
-        'Middleweight': 10,
-        'Light Heavyweight': 11,
-        'Heavyweight': 12,
-        'Super Heavyweight': 13,
-    }
-
-    def json(self):
-        return {
-            'id': self.id,
-            'event_title': self.event_title,
-            'left_fighter_id': self.left_fighter_id,
-            'left_fighter_name': self.left_fighter_name,
-            'left_status': self.left_status,
-            'right_fighter_id': self.right_fighter_id,
-            'right_fighter_name': self.right_fighter_name,
-            'right_status': self.right_status,
-            'weight_class': self.weight_class,
-            'method': self.method,
-            'round': self.round,
-            'time': self.time
-        }
-        
-class Event(db.Model):
-    __tablename__ = 'events'
-
-    title = db.Column(db.String, primary_key=True)
-    date = db.Column(db.DateTime)
-    location = db.Column(db.String)
-
-    def json(self):
-        return {
-            'title': self.title,
-            'date': self.date,
-            'location': self.location,
-        }
-

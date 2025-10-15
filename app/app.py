@@ -1,11 +1,11 @@
 from webbrowser import get
 from flask import Flask, render_template
-from routes.fighters import fighters_blueprint
-from routes.fights import fights_blueprint
 from routes.events import events_blueprint
+from routes.fights import fights_blueprint
+from routes.fighters import fighters_blueprint
 from extensions import db, page_list
 from datetime import date, timedelta
-from models import Fight, Event
+from models import Event, Fight, Fighter
 import logging
 import dotenv
 import os
@@ -24,38 +24,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg://{db_user}:{db_pas
 
 db.init_app(app)
 
-app.register_blueprint(fighters_blueprint)
-app.register_blueprint(fights_blueprint)
 app.register_blueprint(events_blueprint)
+app.register_blueprint(fights_blueprint)
+app.register_blueprint(fighters_blueprint)
 
 url = '/'
 @app.route(url)
 def index():
-    # query to get the next event
-    date_query = Event.query.filter(
-        Event.date >= date.today() - timedelta(days=1)
-    ).order_by(
-        Event.date.asc()
-    ).first()
-
-    if date_query:
-        next_event: str = date_query.title
-    fights_query = Fight.query.filter(Fight.event_title == next_event).all()
-
-    next_event_date = getattr(date_query, 'date')
-
-    # calculate weeks from now to next event
-    delta = next_event_date - date.today()
-    weeks_to_event = delta.days // 7
-    if weeks_to_event <= 0:
-        weeks_to_event = 'This week'
-    else:
-        weeks_to_event = f'{weeks_to_event} weeks from now'
-
     return render_template(
-        'index.html', 
-        page_list=page_list, 
-        fights=fights_query, 
-        weeks_to_event=weeks_to_event,
-        url=url, 
+        'index.html',
+        page_list=page_list,
+        url=url
     )
