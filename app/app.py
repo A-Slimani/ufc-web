@@ -13,7 +13,13 @@ import os
 
 logging.basicConfig(filename='application.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
-env = dotenv.load_dotenv()
+if os.environ.get('RAILWAY_ENVIRONMENT') is None:
+    env = dotenv.load_dotenv()
+    print("Running locally")
+else:
+    print("Running on railway")
+
+
 db_user = os.getenv('DB_USER')
 db_pass = os.getenv('DB_PASSWORD')
 db_host = os.getenv('DB_HOST')
