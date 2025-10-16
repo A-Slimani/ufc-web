@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>{{ site_title }}</title>
   <meta name="ufc archive website" content="previous events and fighters info" />
-  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}"/>   
 </head>
@@ -25,8 +24,8 @@
 </header>
 <body class="container">
   <div>
-    {% if fighter.nick_name %}
     <h2>{{ fighter.full_name }}</h2>
+    {% if fighter.nick_name %}
     <h3>"{{ fighter.nick_name }}"</h3>
     {% endif %}
     
@@ -47,9 +46,8 @@
         <td>{{ fighter.last_active.strftime('%B %d, %Y') if fighter.last_active else 'N/A' }}</td>
       </tr>
     </table>
-
-    <div style="display: flex">
-      <table class="table">
+    <div style="display: flex; gap: 2rem; margin-top: 2rem;">
+      <table class="table" style="flex: 1;">
         <tr>
           <th>Fight Record</th>
         </tr>
@@ -63,20 +61,20 @@
         </tr>
       </table>
 
-      <table class="table">
+      <table class="table" style="flex: 1;">
         <tr>
           <th colspan="2">Win Methods</th>
         </tr>
         <tr>
-          <td>Wins by KO/TKO</td>
+          <td>By KO/TKO</td>
           <td>{{ fighter.ufc_wins_by_ko_tko }}</td>
         </tr>
         <tr>
-          <td>Wins by Submission</td>
+          <td>By Submission</td>
           <td>{{ fighter.ufc_wins_by_sub }}</td>
         </tr>
         <tr>
-          <td>Wins by Decision</td>
+          <td>By Decision</td>
           <td>{{ fighter.ufc_wins_by_dec }}</td>
         </tr>
       </table>
